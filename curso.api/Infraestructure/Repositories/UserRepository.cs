@@ -1,6 +1,7 @@
 ﻿using curso.api.Business.Entities;
 using curso.api.Business.Repositories;
 using curso.api.Infraestructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,9 +29,9 @@ namespace curso.api.Infraestructure.Repositories
             _context.SaveChanges();
         }
 
-        public User GetUser(string login)
+        public async Task<User> GetUserAsync(string login)
         {
-            return _context.User.FirstOrDefault(u => u.Login == login);
+            return await _context.User.FirstOrDefaultAsync(u => u.Login == login);
         }
     }
 }

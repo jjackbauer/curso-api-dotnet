@@ -48,24 +48,23 @@ namespace curso.api.Controllers
         [HttpPost]
         [Route("LogIn")]
         [CustomModelStateValidation]
-        public IActionResult LogIn(LoginViewModelInput loginViewModelInput)
+        public async Task<IActionResult> LogIn(LoginViewModelInput loginViewModelInput)
         {
-            User user = _userRepository.GetUser(loginViewModelInput.Login);
-            var logInModelViewOutput = new LogInModelViewOutput()
-            {
-                code =user.Code,
-                login = user.Login,
-                email = user.Email
-            };
+            User user = await _userRepository.GetUserAsync(loginViewModelInput.Login);
             
-            
-            var token = _authenticationService.GetToken(logInModelViewOutput);
+            if (user == null)
+                throw new Exception();
 
-            return Ok(new  
+            var token = _authenticationService.GetToken(user);
+            var loginViewModelOutput = new LoginViewModelOutput()
             {
-                Token = token, 
-                User = logInModelViewOutput
-            });
+                Token = token,
+                Login = user.Login,
+                Email = user.Email
+            };
+          
+
+            return Ok(loginViewModelOutput);
         }
         /// <summary>
         /// This service alows the registration of a user in the system
@@ -78,24 +77,28 @@ namespace curso.api.Controllers
         [HttpPost]
         [Route("SignUp")]
         [CustomModelStateValidation]
-        public IActionResult SignUp(RegisterViewModelInput registerViewModelInput)
+        public async Task<IActionResult> SignUp(RegisterViewModelInput registerViewModelInput)
         {
-           
+
             //var pendingMigrations = context.Database.GetPendingMigrations();
 
             //if (pendingMigrations.Count() > 0)
             //    context.Database.Migrate();
 
-            var user = new User();
-            user.Login = registerViewModelInput.Login;
-            user.Email = registerViewModelInput.Email;
-            user.Password = registerViewModelInput.Password;
-            //context.User.Add(user);
-            //context.SaveChanges();
-            _userRepository.Add(user);
-            _userRepository.Commit();
 
-            
+
+            var user = await _userRepository.GetUserAsync(registerViewModelInput.Login);
+
+            if (user != null)
+                return BadRequest("User already Signed in the system");
+
+            var newUser = new User();
+            newUser.Login = registerViewModelInput.Login;
+            newUser.Email = registerViewModelInput.Email;
+            newUser.Password = registerViewModelInput.Password;
+           
+            _userRepository.Add(newUser);
+            _userRepository.Commit();
 
             return Created("", registerViewModelInput);
         }

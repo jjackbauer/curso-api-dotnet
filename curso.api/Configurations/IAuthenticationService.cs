@@ -1,4 +1,5 @@
-﻿using curso.api.Controllers;
+﻿using curso.api.Business.Entities;
+using curso.api.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,6 @@ namespace curso.api.Configurations
 {
     public interface IAuthenticationService
     {
-        public string GetToken(LogInModelViewOutput logInModelViewOutput);
+        public string GetToken(User user);
     }
 }

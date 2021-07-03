@@ -1,4 +1,5 @@
-﻿using curso.api.Controllers;
+﻿using curso.api.Business.Entities;
+using curso.api.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -18,7 +19,7 @@ namespace curso.api.Configurations
         {
             _configuration = configuration;
         }
-        string IAuthenticationService.GetToken(LogInModelViewOutput logInModelViewOutput)
+        string IAuthenticationService.GetToken(User user)
         {
             var secret = Encoding.ASCII.GetBytes(_configuration.GetSection("JwtConfigurations:Secret").Value);
             var symmetricSecurityKey = new SymmetricSecurityKey(secret);
@@ -26,9 +27,9 @@ namespace curso.api.Configurations
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.NameIdentifier, logInModelViewOutput.code.ToString()),
-                    new Claim(ClaimTypes.Name, logInModelViewOutput.login.ToString()),
-                    new Claim(ClaimTypes.Email, logInModelViewOutput.email.ToString())
+                    new Claim(ClaimTypes.NameIdentifier, user.Code.ToString()),
+                    new Claim(ClaimTypes.Name, user.Login.ToString()),
+                    new Claim(ClaimTypes.Email, user.Email.ToString())
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256Signature)

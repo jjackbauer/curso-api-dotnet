@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace curso.api.Controllers
 {   
-    [Route("api/v1/courses")]
+    [Route("api/v1/Courses")]
     [ApiController]
     [Authorize]
     public class CourseController : ControllerBase
@@ -32,29 +32,35 @@ namespace curso.api.Controllers
         [SwaggerResponse(statusCode: 201, description: "Course cadastration sucessfull")]
         [SwaggerResponse(statusCode: 401, description: "Not Authorized")]
         [HttpPost]
-        [Route("")]
+        [Route("Register")]
         public async Task<IActionResult> Post(CourseViewModelInput courseViewModelInput)
         {
             var userCode = int.Parse(User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value);
 
             Course course = new Course();
             course.Name = courseViewModelInput.Name;
-            course.Description = courseViewModelInput.description;
+            course.Description = courseViewModelInput.Description;
             course.UserCode = userCode;
             _courseRepository.Add(course);
             _courseRepository.Commit();
 
-            return Created("", courseViewModelInput);
+            var courseViewModelOutput = new CourseViewModelOutput
+            {
+                Name = course.Name,
+                Descritpion = course.Description
+            };
+
+            return Created("", courseViewModelOutput);
         }
 
         ///<summary>
-        ///This service alows an authenticated user to register a course
+        ///This service alows an authenticated user to get information about his courses
         ///</summary>
         ///<returns> It return status 201 and the user course data </returns>
         [SwaggerResponse(statusCode: 200, description: "Course obtainment sucessfull")]
         [SwaggerResponse(statusCode: 401, description: "Not Authorized")]
         [HttpGet]
-        [Route("")]
+        [Route("View")]
 
         public async Task<IActionResult> Get()
         {

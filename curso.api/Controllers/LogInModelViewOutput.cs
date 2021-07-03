@@ -1,10 +1,7 @@
 ﻿namespace curso.api.Controllers
 {
     public class LogInModelViewOutput
-    {
-        public LogInModelViewOutput()
-        {
-        }
+    { 
 
         public int code { get; set; }
         public string login { get; set; }
